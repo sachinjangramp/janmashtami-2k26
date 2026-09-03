@@ -136,27 +136,33 @@ export default function ManageScreen({ modules, onChange, onBack }) {
                                         }
                                     />
                                     <div className="manage-options">
-                                        {question.options.map((option, optionIndex) => (
-                                            <label key={optionIndex}>
-                                                <input
-                                                    type="radio"
-                                                    name={`correct-${question.id}`}
-                                                    checked={question.correctIndex === optionIndex}
-                                                    onChange={() =>
-                                                        updateQuestion(question.id, { correctIndex: optionIndex })
-                                                    }
-                                                />
-                                                <input
-                                                    value={option}
-                                                    placeholder={`Option ${optionIndex + 1}`}
-                                                    onChange={(event) => {
-                                                        const options = [...question.options]
-                                                        options[optionIndex] = event.target.value
-                                                        updateQuestion(question.id, { options })
-                                                    }}
-                                                />
-                                            </label>
-                                        ))}
+                                        {question.options.map((option, optionIndex) => {
+                                            const correctIndexes = question.correctIndexes ?? [question.correctIndex ?? 0]
+                                            const isChecked = correctIndexes.includes(optionIndex)
+                                            return (
+                                                <label key={optionIndex}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => {
+                                                            const next = isChecked
+                                                                ? correctIndexes.filter((i) => i !== optionIndex)
+                                                                : [...correctIndexes, optionIndex].sort((a, b) => a - b)
+                                                            updateQuestion(question.id, { correctIndexes: next.length ? next : [optionIndex] })
+                                                        }}
+                                                    />
+                                                    <input
+                                                        value={option}
+                                                        placeholder={`Option ${optionIndex + 1}`}
+                                                        onChange={(event) => {
+                                                            const options = [...question.options]
+                                                            options[optionIndex] = event.target.value
+                                                            updateQuestion(question.id, { options })
+                                                        }}
+                                                    />
+                                                </label>
+                                            )
+                                        })}
                                     </div>
                                     <textarea
                                         rows={2}

@@ -14,7 +14,7 @@ export function emptyQuestion() {
         id: createId(),
         text: '',
         options: ['', '', '', ''],
-        correctIndex: 0,
+        correctIndexes: [0],
         explanation: '',
     }
 }

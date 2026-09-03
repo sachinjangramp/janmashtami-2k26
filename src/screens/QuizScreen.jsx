@@ -13,6 +13,11 @@ export default function QuizScreen({ module, onBack }) {
     const total = questions.length
 
     const optionItems = useMemo(() => question?.options ?? [], [question])
+    const correctIndexes = useMemo(
+        () => question?.correctIndexes ?? (question?.correctIndex != null ? [question.correctIndex] : [0]),
+        [question],
+    )
+    const isMulti = correctIndexes.length > 1
 
     useEffect(() => {
         setIndex(0)
@@ -60,7 +65,8 @@ export default function QuizScreen({ module, onBack }) {
                             {module.title}
                             {module.hard ? <span className="hard-tag">Hard</span> : null}
                         </p>
-                        <span>
+                        <span className="quiz-meta-right">
+                            {isMulti && <span className="quiz-multi-badge">Select {correctIndexes.length}</span>}
                             Question {index + 1} of {total}
                         </span>
                     </header>
@@ -69,7 +75,7 @@ export default function QuizScreen({ module, onBack }) {
 
                     <div className="quiz-options">
                         {optionItems.map((option, optionIndex) => {
-                            const isCorrect = optionIndex === question.correctIndex
+                            const isCorrect = correctIndexes.includes(optionIndex)
                             const showCorrect = revealed && isCorrect
                             return (
                                 <div
@@ -84,9 +90,15 @@ export default function QuizScreen({ module, onBack }) {
                     </div>
 
                     {revealed ? (
-                        <p className="quiz-explain glass">{question.explanation}</p>
+                        <div className="quiz-bottom">
+                            <p className="quiz-explain glass">{question.explanation}</p>
+                        </div>
                     ) : (
-                        <p className="quiz-hint">Space to reveal · arrows to move</p>
+                        <div className="quiz-bottom quiz-bottom--hint">
+                            <p className="quiz-hint">
+                                {isMulti ? `Pick ${correctIndexes.length} · ` : ''}Space to reveal · arrows to move
+                            </p>
+                        </div>
                     )}
                 </main>
             ) : (

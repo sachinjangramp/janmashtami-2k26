@@ -11,6 +11,7 @@ export default function ModuleIndex({
   onManage,
   onLogout,
 }) {
+
   return (
     <div className="stage index-screen">
       <StageBackground />
