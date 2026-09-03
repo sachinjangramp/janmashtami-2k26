@@ -51,3 +51,89 @@ img {
 button {
   cursor: pointer;
 }
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 40%;
+  filter: brightness(1.08) saturate(1.06);
+  pointer-events: none;
+}
+
+.stage-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+      rgba(255, 250, 236, 0.42) 0%,
+      rgba(255, 250, 236, 0.18) 28%,
+      rgba(255, 250, 236, 0.28) 100%);
+}
+
+.glass {
+  background: rgba(255, 253, 248, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 18px 40px rgba(180, 140, 40, 0.12),
+    inset 0 0 0 1px rgba(240, 193, 75, 0.25);
+  backdrop-filter: blur(14px);
+}
+
+.btn-gold,
+.btn-ghost {
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  height: 44px;
+  padding: 0 1.35rem;
+  transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
+}
+
+.btn-gold {
+  color: #4a3108;
+  background: linear-gradient(180deg, #ffe07a 0%, #f5c230 55%, #e09b12 100%);
+  box-shadow: 0 8px 18px rgba(224, 155, 18, 0.2);
+}
+
+.btn-ghost {
+  color: var(--peacock);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(26, 122, 114, 0.22);
+}
+
+.btn-gold:hover,
+.btn-ghost:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.hard-tag {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b2a10;
+  background: linear-gradient(180deg, #ffd389, #f0a03a);
+  border-radius: 999px;
+  padding: 0.4em 0.8em;
+}
+
+input,
+textarea {
+  user-select: text;
+}
