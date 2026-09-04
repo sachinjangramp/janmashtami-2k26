@@ -33,6 +33,182 @@
     padding-top: 1.6vh;
 }
 
+/* Direction of travel. "next" peels away to the left and arrives from the
+   right; "prev" mirrors it. */
+.quiz-board--next {
+    --dissolve-x: -3vw;
+    --arrive-x: 3vw;
+}
+
+.quiz-board--prev {
+    --dissolve-x: 3vw;
+    --arrive-x: -3vw;
+}
+
+/* Soft gold bloom that swells behind the board as a question condenses. */
+.quiz-aura {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 68vw;
+    height: 62vh;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center,
+            rgba(255, 216, 128, 0.34) 0%,
+            rgba(240, 193, 75, 0.14) 42%,
+            rgba(224, 155, 18, 0) 72%);
+    filter: blur(26px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.quiz-board.is-arriving .quiz-aura {
+    animation: quiz-aura-in 700ms cubic-bezier(0.22, 0.68, 0.3, 1) both;
+}
+
+.quiz-board.is-leaving .quiz-aura {
+    animation: quiz-aura-out 400ms ease-in both;
+}
+
+@keyframes quiz-aura-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.84);
+    }
+
+    32% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.16);
+    }
+}
+
+@keyframes quiz-aura-out {
+    0% {
+        opacity: 0.22;
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+/* ---- question change: scatter into sparkles, then condense back ----
+   Durations and delays here are mirrored by SWAP_MS / ARRIVE_MS in
+   QuizScreen.jsx: every exit child must be fully transparent by 470ms, and
+   every entrance child must be settled by 760ms. */
+.quiz-board.is-leaving .quiz-meta,
+.quiz-board.is-leaving .quiz-question,
+.quiz-board.is-leaving .quiz-options,
+.quiz-board.is-leaving .quiz-bottom {
+    will-change: opacity, transform, filter;
+    animation: quiz-dissolve 400ms cubic-bezier(0.36, 0.1, 0.52, 1) forwards;
+}
+
+.quiz-board.is-leaving .quiz-meta {
+    animation-delay: 0ms;
+}
+
+.quiz-board.is-leaving .quiz-question {
+    animation-delay: 0ms;
+}
+
+.quiz-board.is-leaving .quiz-options {
+    animation-delay: 35ms;
+}
+
+.quiz-board.is-leaving .quiz-bottom {
+    animation-delay: 70ms;
+}
+
+.quiz-board.is-arriving .quiz-meta,
+.quiz-board.is-arriving .quiz-question,
+.quiz-board.is-arriving .quiz-options,
+.quiz-board.is-arriving .quiz-bottom {
+    will-change: opacity, transform, filter;
+    animation: quiz-materialize 620ms cubic-bezier(0.16, 0.84, 0.28, 1) both;
+}
+
+.quiz-board.is-arriving .quiz-meta {
+    animation-delay: 0ms;
+}
+
+.quiz-board.is-arriving .quiz-question {
+    animation-delay: 45ms;
+}
+
+.quiz-board.is-arriving .quiz-options {
+    animation-delay: 90ms;
+}
+
+.quiz-board.is-arriving .quiz-bottom {
+    animation-delay: 130ms;
+}
+
+@keyframes quiz-dissolve {
+    0% {
+        opacity: 1;
+        filter: blur(0) brightness(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    40% {
+        opacity: 0.55;
+        filter: blur(6px) brightness(1.16);
+    }
+
+    100% {
+        opacity: 0;
+        filter: blur(18px) brightness(1.4) saturate(0.65);
+        transform: translate3d(var(--dissolve-x, -3vw), -2.4vh, 0) scale(1.04);
+    }
+}
+
+@keyframes quiz-materialize {
+    0% {
+        opacity: 0;
+        filter: blur(16px) brightness(1.32);
+        transform: translate3d(var(--arrive-x, 3vw), 1.6vh, 0) scale(0.985);
+    }
+
+    46% {
+        opacity: 0.88;
+        filter: blur(4px) brightness(1.12);
+    }
+
+    100% {
+        opacity: 1;
+        filter: blur(0) brightness(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+/* Light sweep across the question card as it resolves. */
+.quiz-board.is-arriving .quiz-question::after {
+    animation: quiz-shimmer 620ms cubic-bezier(0.22, 0.7, 0.3, 1) 80ms both;
+}
+
+@keyframes quiz-shimmer {
+    0% {
+        opacity: 0;
+        background-position: 135% 0;
+    }
+
+    22% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+        background-position: -65% 0;
+    }
+}
+
 .quiz-meta {
     display: flex;
     justify-content: space-between;
@@ -71,6 +247,8 @@
 }
 
 .quiz-question {
+    position: relative;
+    overflow: hidden;
     padding: 3vh 2.2vw;
     border-radius: 22px;
     font-family: var(--font-display);
@@ -78,6 +256,25 @@
     font-weight: 600;
     color: var(--ink);
     line-height: 1.35;
+}
+
+/* Shimmer sweep, revealed only while the question is condensing. */
+.quiz-question::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg,
+            rgba(255, 248, 220, 0) 34%,
+            rgba(255, 244, 200, 0.5) 46%,
+            rgba(255, 255, 255, 0.72) 50%,
+            rgba(255, 244, 200, 0.5) 54%,
+            rgba(255, 248, 220, 0) 66%);
+    background-size: 260% 100%;
+    background-position: 135% 0;
+    background-repeat: no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .quiz-options {
@@ -178,4 +375,31 @@
     font-family: var(--font-display);
     color: var(--peacock);
     margin-bottom: 1vh;
+}
+
+/* Reduced motion: QuizScreen.jsx already skips the particle field entirely, so
+   this only trims the CSS side as a safety net. */
+@media (prefers-reduced-motion: reduce) {
+
+    .quiz-board.is-leaving .quiz-meta,
+    .quiz-board.is-leaving .quiz-question,
+    .quiz-board.is-leaving .quiz-options,
+    .quiz-board.is-leaving .quiz-bottom,
+    .quiz-board.is-arriving .quiz-meta,
+    .quiz-board.is-arriving .quiz-question,
+    .quiz-board.is-arriving .quiz-options,
+    .quiz-board.is-arriving .quiz-bottom {
+        animation-duration: 1ms;
+        animation-delay: 0ms;
+    }
+
+    .quiz-board.is-arriving .quiz-aura,
+    .quiz-board.is-leaving .quiz-aura,
+    .quiz-board.is-arriving .quiz-question::after {
+        animation: none;
+    }
+
+    .quiz-explain {
+        animation: none;
+    }
 }
